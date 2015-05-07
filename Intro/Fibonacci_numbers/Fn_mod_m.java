@@ -1,3 +1,15 @@
+// Problem Statement:
+
+// Given 1≤n≤10^18 and 2≤m≤10^5, output Fnmodm. 
+
+// Sample Input:
+// 281621358815590 30524
+// Sample Output:
+// 11963
+
+// Memory Limit: 256 MB
+// Time Limit: 5 seconds
+
 import java.util.Scanner;
 import java.util.Arrays;
 import java.math.BigInteger;

@@ -1,3 +1,21 @@
+// Problem Statement:
+
+// The first line of the input contains an integer 1≤n≤10^5 
+// and an array A[1…n] containing n pairwise different positive 
+// integers from 1 to 109 in increasing order: A[1]<A[2]<…<A[n]. 
+// The next line contains an integer 1≤k≤10^5 and k positive 
+// integers b1,…,bk. For all i from 1 to k, output an index 1≤j≤n
+// such that A[j]=bi or −1 is there is no such index.
+
+// Sample Input:
+// 5 1 5 8 12 13
+// 5 8 1 23 1 11
+// Sample Output:
+// 3 1 -1 1 -1
+
+// Memory Limit: 256 MB
+// Time Limit: 5 seconds
+
 import java.util.Scanner;
 
 class BinarySearch{
