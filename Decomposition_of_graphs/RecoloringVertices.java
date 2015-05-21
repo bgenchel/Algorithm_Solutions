@@ -76,11 +76,10 @@ class Main {
         graph.get(end).add(start);
   	}
 
-  	boolean[] previsited = new boolean[n+1];
-    boolean[] postvisited = new boolean[n+1];
+    boolean[] visited = new boolean[n+1];
   	for(int i = 1; i <= n; i++){
-  		if(!previsited[i]){
-  			if(!DFS(i, previsited, postvisited, colors, graph)){
+  		if(!visited[i]){
+  			if(!DFS(i, visited, colors, graph)){
           System.out.println("Impossible");
           return;
         }
@@ -104,32 +103,30 @@ class Main {
   }
 
 
-  public static boolean DFS(int start, boolean[] previsited,
-                boolean[] postvisited,
+  public static boolean DFS(int start, boolean[] visited,
                 Color[] colors, 
   							HashMap<Integer, LinkedList<Integer>> graph){
 
-  	if(!graph.containsKey(start) || previsited[start])
+  	if(!graph.containsKey(start) || visited[start])
   		return true;
 
-    previsited[start] = true;
     LinkedList<Color> possible_colors = GenerateColorList();
-  	for(int neighbor : graph.get(start)){
-      if(!DFS(neighbor, previsited, postvisited, colors, graph))
-        return false;
-    }
-
     possible_colors.remove(colors[start]);
-    for(int neighbor : graph.get(start)){
-      if(previsited[neighbor] && postvisited[neighbor])
+  	for(int neighbor : graph.get(start)){
+      if(visited[neighbor])
         possible_colors.remove(colors[neighbor]);
     }
 
     if(possible_colors.isEmpty())
       return false;
-    
+
     colors[start] = possible_colors.peek();
-    postvisited[start] = true;
+    visited[start] = true;
+
+    for(int neighbor : graph.get(start)){
+      if(!DFS(neighbor, visited, colors, graph))
+        return false;
+    }
  	  return true;
   }
 
