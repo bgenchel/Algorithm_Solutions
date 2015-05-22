@@ -34,24 +34,28 @@ class Main {
  			graph[node2] = new Node(node2);
  		graph[node1].edges.add(new DirEdge(graph[node2], weight));
  	}
- 	int startnum = sc.nextInt();
- 	int endnum = sc.nextInt();
- 	if(graph[startnum] == null || graph[endnum] == null)
+
+ 	int pathStart = sc.nextInt();
+ 	int pathEnd = sc.nextInt();
+ 	if(graph[pathStart] == null || graph[pathEnd] == null)
  		System.out.println(-1);
  	else
- 		System.out.println(Djikstra(graph[startnum], graph[endnum]));
+ 		System.out.println(Djikstra(graph[pathStart], graph[pathEnd]));
   }
 
   public static int Djikstra(Node start, Node end){
 
   	PriorityQueue<Node> pq = new PriorityQueue<Node>(11, new NodeComp()); 
   	start.distance = 0;
-  	start.onQueue = true;
   	pq.add(start);
 
   	while(!pq.isEmpty()){
   		Node curr = pq.poll();
-  		curr.onQueue = false;
+  		//handle duplicates on the queue.
+  		//duplicates exist because algorithm readds nodes when their distances are changed
+  		//so that nodes are sorted correctly on the priority queue.
+  		if(curr.done) 
+  			continue;
   		//System.err.println("Curr node = " + curr.vertex_num);
   		if(curr.equals(end))
   			return curr.distance;
@@ -59,17 +63,11 @@ class Main {
   		for(DirEdge e : curr.edges){
   			Node neighbor = e.end;
   			//System.err.println("on edge of " + curr.vertex_num + " corr. to " + neighbor.vertex_num);
-  			if(neighbor.done)
-  				continue;
-
-  			if(neighbor.distance > curr.distance + e.weight)
+  			if(neighbor.distance > curr.distance + e.weight){
   				neighbor.distance = curr.distance + e.weight;
-
-  			//System.err.println(neighbor.vertex_num + " now has distance " + neighbor.distance);
-  			if(!neighbor.onQueue){
-  				neighbor.onQueue = true;
-  				pq.add(neighbor);
-  			}
+	  			//System.err.println(neighbor.vertex_num + " now has distance " + neighbor.distance);
+	  			pq.add(neighbor);
+	  		}
   		}
   		curr.done = true;
   	}
@@ -87,14 +85,12 @@ class Node{
 	int vertex_num;
 	int distance;
 	boolean done;
-	boolean onQueue;
 	LinkedList<DirEdge> edges;
 
 	public Node(int num){
 		vertex_num = num;
 		distance = Integer.MAX_VALUE;
 		done = false;
-		onQueue = false;
 		edges = new LinkedList<DirEdge>();
 	}
 
