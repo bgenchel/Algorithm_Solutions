@@ -1,0 +1,375 @@
+CSE 101: Algorithms Review
+
+********** Overview **************
+
+Running Time
+	- T(n): the number of ‘computer steps’ taken 
+	- log(n) < sqrt(n) < n < nlog(n) < n^2 < 2^n
+
+
+Fibonacci Numbers
+
+	Lemma: Asymptotic Growth Rate
+ 
+		Fn >= 2^(n/2) for n >= 6
+
+		Proof: by Induction
+			Base: F6 = 8 = 2^(6/2), F7 = 13 > 2^(7/2)
+			Thus, For n > 7
+				Fn = F_n-1 + F_n-2 >= 2^((n-1)/2) + 2^((n-2)/2)
+							        =  2^((n-2)/2)*(sqrt(2) + 1)	   
+							  		> 2^((n-2)/2)*2 = 2^(n/2)
+
+		DP Implementation
+			function Fib(n):
+				if n <= 1:
+					return n
+				create an array F[0 … n]
+				F[0] = 0, F[1] = 1
+				for i from 2 to n:
+					F[i] = F[i-1] + F[i-2]
+				return F[n]
+
+			- Running time is linear (each value of F from 1 to n is evaluated only once)
+			- Linear number of arithmetic operations but quadratic number of bit operations
+
+
+
+Sorting and Searching
+	- covers count sort, but i'll leave that to the actual sorting and searching section.
+	
+	Searching for two elements with a given sum
+		
+		Naive Method:
+			function SumSearch(A[1...n], S):
+				for i from 1 to n:
+					for j from i+1 to n:
+						if A[i] + A[j] = S:
+							return i, j
+				return -1 //if not found
+
+			- Running time: O(n^2), Theta(n^2)
+
+		Two Pointer Method:
+			function SumSearchTwoPointers(A[1...n], S):
+				//A is sorted
+				l = 1, r = n
+				while l < r:
+					if A[l] + A[r] = S:
+						return l, r
+					else if A[l] + A[r] > S:
+						r--
+					else if A[l] + A[r] < S:
+						l++
+				return -1 //if not found
+
+			- Running time: O(n)
+
+
+
+********** Divide and Conquer **************
+
+Integer Multiplication 
+	- Integer Addition: O(n), just add the values at each bit, carries aren't too expensive.
+	- Integer Multiplication: O(n^2), whole of one number needs to be multiplied by each digit of the other.
+
+	- Recurrent Formula:
+		- y = 2*floor(y/2), y even
+		    = 1 + 2*floor(y/2), y odd
+
+		=> x*y = 2*(x*floor(y/2)), y even
+			  = x + 2*(x*floor(y/2))
+
+		Psuedocode: 
+			function Multiply(x,y): //input is two n-bit integers
+				if y = 0: 
+					return 0
+				z = multiply(x, floor(y/2))
+				if y is even:
+					return 2*z
+				else:
+					return x + 2*z
+
+		- running time: O(n^2), number of bits in y decreases by 1 at each recursive call
+
+	- Better Recurrent Formula:
+		- x = 2^(n/2)*xL + xR //left bits are shifted into place
+		  y = 2^(n/2)*yL + yR
+
+		=> x*y = (2^(n/2)*xL + xR)*(2^(n/2)*yL + yR)
+			   = 2^(n)*xL*yL + 2^(n/2)*(xL*yR + xR*yL) + xRyR
+
+		- This still includes 4 multiplications => 4 recusive calls; can be improved
+
+			- compute 3 recursive calls by substituting:
+				(xL*yR + xR*yL) = (xL + xR)*(yL + yR) - xL*yL - xR*yR
+
+			- Psuedocode: 
+				function Karatsuba(x,y): //input is two integers in binary
+					n = max(size of x, size of y)
+					if n = 1:
+						return x*y
+					xL = left ceil(n/2) bits of x //shift right to get
+					xR = right floor(n/2) bits of x
+					yL = left ceil(n/2) bits of y
+					yR = right floor(n/2) bits of y
+
+					P1 = Karatsuba(xL, yL)
+					P2 = Karatsuba(xR, yR)
+					P3 = Karatsuba(xL + xR, yL + yR)
+
+					return 2^(2*floor(n/2)) + (P3 - P1 - P2)*2^(floor(n/2)) + P2
+
+				- recurrent relation: T(n) = 3*T(n/2) + O(n)
+					=> running time = Sum[i=0:k] 3^i*c*n/2*i
+									= c*n*Sum[i=0:k] (3/2)^i
+									= c*n*Sum[i=0:log2(n)] //k is the number of levels in the recursion tree = log(n)
+									= c*n*O(3^(log2(n))/2^(log2(n)))
+									= O(n^log2(3))
+									= O(n^1.584)
+
+
+
+Recurrence Relations
+		- Master theorem:
+			for recursive problem with T(n) = a*T(ceil(n/b)) + O(n^d)
+				T(n) = O(n^d), d > logb(a)
+					 = O(n^d*log(n)), d = logb(a)
+					 = O(n^logb(a)), d < logb(a)
+
+			proof: A problem with the above recurrence relation will recursively split down into levels that have a^i problems of size (n/(b^i) 
+			such that the sum of all the work done is 
+				Sum[i=0:k] a^i*c*(n/(b^i))^d = c*n^d*Sum[i=0:k] (a/(b^d))^i
+										     = c*n^d*Sum[i=0:logb(n)] (a/(b^d))^i
+
+				
+					- if b^d = a (i.e. d = logb(a))
+						T(n) = c*n^d*Sum[i=0:logb(n)] 1
+							 = c*n^d*logb(n) 
+							 = O(n^d*log(n))
+
+					- if b^d > a (i.e. d > logb(a))
+						T(n) = c*n^d*Sum[i=0:logb(n)] (some value less than 1)^i
+							 = c*n^d*1
+							 = O(n^d)
+
+					if b^d < a (i.e. d < logb(a))
+						T(n) = c*n^d*Theta(a^(logb(n))/b^(d*logb(n)))
+							 = c*n^d*Theta(n^logb(a)/n^d)
+							 = O(n^logb(a))
+
+
+Matrix Multiplication
+	- Naive algorithm:
+		for X*Y = Z, Z[i,j] = Sum[k=1:n] X[i,k]*Y[k,j]
+		
+		PsuedoCode:
+			function NaiveMatMult(X, Y):
+				Z = new matrix with X.numrows rows and Y.numcolumns columns
+				initialize all Z elements to 0
+				for i in 1 to X.numrows:
+					for j in 1 to Y.numcolumns:
+						for k in X.numcolumns (= Y.numrows):
+							Z[i,j] += X[i,k]*Y[k,j]
+
+
+				return Z
+
+			- time complexity is O(n^3) (general for nxn matrices)
+
+	- Block multiplication generalization:
+		- X = [X11 X12]  Y = [Y11 Y12]
+			  [X21 X22]      [Y21 Y22]
+
+		 => X*Y = [X11*Y11 + X12*Y22  X11*Y21 + X12*Y22]
+		 		  [X21*Y11 + X22*Y21  X21*Y21 + X22*Y22]
+
+		- 8 distinct multiplications implies
+			- T(n) = 8*T(n/2) + O(n^2) //recombination of nxn matrices is n^2 additions
+
+			- by master theorem this is still O(n^3)
+
+		- Improvement: Strassen algorithm 
+			- essence is that you can write the multiplication in terms of 7 more abstract terms that each contain 1 multiplication
+			- This reduces recurrence to T(n) = 7*T(n/2) + O(n^2) => O(n^(log2(7))) = O(n^2.807) slightly less than for our original formulation
+
+
+
+
+********** Data Structures **************
+
+Dynamic Array
+	- Changes size dynamically to fit elements being added to it.
+
+	- Additive Reallocation Scheme
+		- increase size of array by certain number (k) each time capacity is reached and then shift all entries over.
+		- total time for all reallocations = k + 2*k + 3*k + ... n 
+									 	   = k*(1 + 2 + ... n/10) 
+									 	   = k*(n/10)*(n/10 - 1)/2 
+									       = k*n^2/200 - k*n/20
+									       = O(n^2)
+
+		- because size is increased so often (about n), average (amortized) time for inserting one new element is O(n)
+
+	- Multiplicative Reallocation Scheme
+		- double size of array whenever capacity is reached
+		- total time for all reallocations = 1 + 2 + 4 + .. + n 
+										   = 2*n
+										   = O(n)
+
+		- because size is increased by so much, average (amortized) running time for inserting element is O(1).
+
+
+
+Heap
+	- Priority Queue
+		- Implements these methods: 
+			- Insert(p): adds new element with priority p
+			- Remove(it): removes element pointed to by iterator it
+			- GetMin(): returns an element with minimal priority
+			- ExtractMin(): extracts an element with minimal priority
+			- ChangePriority(it, p): changes priority of element pointed to by it to p
+
+		- Naive Implementations
+			- Array
+				- just trys to peform these methods by iteratively searching through an unsorted array where the elements are stored
+				- GetMin() takes O(n) because one has to compare every element
+
+			- Sorted Array
+				- GetMin() is O(1) because the minimum element will always be at the front
+				- Remove takes O(n) because elements have to be sifted towards the front
+
+			- Sorted List
+				- GetMin() is O(1), just take the head of the list
+				- Remove is O(1), only have to change the head pointer
+				- Insert is O(n), have to go through the list to find the right spot.
+
+		- Best practice is to implement with a heap, which has O(log(n)) for all operations.
+
+	- Binary (Min) Heap
+		- satisfies (min) heap property: every node is <= to each of its children.
+
+		- Priority Queue Implementation
+			- GetMin():
+				- min value is at the root => O(1)
+
+			- Insertion: 
+				- Insert and Sift Up: Put the new element as a leaf, then bubble it up the tree 
+				  (trade places with lesser parents) until its in the right spot.
+
+				- Running time = O(h) where h is the height of the tree.
+							   = O(log(n))
+
+				- invarient: at any point in time, the heap property is violated at at most one vertex
+
+			- ExtractMin:
+				- ExtractMin and SiftDown: Take the root out, replace it with a leaf. Then, move the new 
+				  root down the tree, swapping it with its smaller child, until its in the 'right' spot.
+
+				- Again, Running time = O(h) = O(log(n))
+
+			- ChangePriority:
+				- change the priority and let the changed element sift up or down 
+				depending on whether its priority decreased or increased.
+
+				- b/c sifting operation, run time is O(log(n))
+
+			- Remove:
+				- change the priority of the element to -inf, let it sift up then extract the minimum.
+
+				- two sifting operations => O(2*log(n)) = O(log(n))
+
+	- Heap in Array
+		- for a complete binary tree, levels are filled in from left to right; all rows full except last one
+
+		- fill array level by level from left to right
+
+		- vertex number i has parent floor(i/2) and children 2*i and 2*i+1
+
+	- 2 choice problems to review in Stepic section
+
+
+
+Segment Trees
+	- Solves (Dynamic) range minimum/sum query problem:
+		- given: array A[1 ... n] of integers
+		- operations:
+			- Query(l, r): returns the minimum value/sum of the elements of the subarray A[l ... r]
+
+			- Update(i, x) changes the value of A[i] to x 
+
+		- Naive Solution (linear search)
+			- Query(l, r) = O(r - l + 1)
+			- Update(i, x) = O(1), since everything is just stored in place in an array
+
+
+	- Segment Tree:
+		- tree in which root represents whole array and child nodes represent half the range of 
+		  their parents down to individual leaves. 
+		- For the min/sum query problem, each node holds the min value or sum for its designated range.
+
+		- Construction takes O(n) time:
+			- Start from leaves; one node for each individual leaf; then, 'combine' leaves by creating 
+			  parent nodes that contain the min value/sum between the two. Set the leaves as children to this node. 
+			  Repeat until all leaves have been joined. 
+
+			- Time complexity is n + n/2 + ... + 1 = 2n => O(n)
+
+		- Update():
+			- When a leaf value is updated, all parent values up to the root must adapt the change. That's h levels to check, or O(log(n))
+
+		- Query():
+			- segments represented by tree branches are called canonical, they represent perfect division of the range of the array.	
+
+			- any conceivable segment of the original set can be represented as a disjoint union of O(log(n)) canonical segments that can be found recursively.
+
+			- PsuedoCode:
+				function QuerySegmentTree(l, r, node_l, node_r, node):
+					if [node_l:node_r] = [l:r] or fits inside [l:r]:
+						return node.min_value //the value contained at the node
+
+					if [l:r] is non intersecting with [node_l:node_r] (completely outside its range): 
+						return inf
+
+					halfway = floor((node_l + node_r)/2)
+					return min(QuerySegmentTree(l, r, node_l, halfway, node.left), QuerySegmentTree(l, r, halfway, node_r, node.right))
+
+				- searching through a tree, so running time is O(log(n))
+
+
+
+Disjoint Sets
+	- Overarching disjoint sets datastructure implements the following methods: 
+		- MakeSet(x): creates a singleton set consisting of x
+		- Union(x,y): merges the two sets containing x and y respectively.
+		- Find(x): returns an ID of the set containing x
+
+	- Psuedocode:
+		function MakeSet(x):
+			insert x into forest of sets 
+			set its parent/ID to itself
+			set its rank to 0
+
+		function Find(x):
+			pull the node x from array/hashtable storage, follow parent pointers up until the current node is its own parent, then return that node/ID
+
+		function Union(x,y):
+			rx = Find(x)
+			ry = Find(y)
+			if rx = ry: 
+				return
+
+			if rank(rx) > rank(ry):
+				parent(ry) = rx
+			else: 
+				parent(rx) = ry
+				if rank(rx) = rank(ry):
+					rank(ry)++
+
+	- Lemma: Any node of rank k has at least 2^k nodes in its tree
+		- Corollary: running time of Find and Union is O(log(n))
+
+	- Path Compression:
+		- when find is called, parents can be called recursively, allowing a reference to the root to then be sent back through 
+		  the recursion so that each node on the path can set its parent directly to the root, reducing find and union times.
+
