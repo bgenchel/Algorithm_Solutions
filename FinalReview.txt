@@ -373,3 +373,331 @@ Disjoint Sets
 		- when find is called, parents can be called recursively, allowing a reference to the root to then be sent back through 
 		  the recursion so that each node on the path can set its parent directly to the root, reducing find and union times.
 
+
+
+********** Sorting **********
+
+Sorting Basics
+	- Measure efficiency by number of comparisons.
+	- Stable Sort: sort in which elements deemed the same by value remain ordered as they were in the original set.
+
+	- Stable Counting Sort O(n + M):
+		Psuedocode:
+			function CountSort(A[1...n]): //input is array of n integers
+				create an array B[1 ... M], initialize with 0's
+				for i from 1 to n:
+					B[A[i]] = B[A[i]] + 1
+				for j from 2 to M:
+					B[j] = B[j] + B[j-1]
+				for j from n to 1:
+					A'[B[A[j]]] = A[j]
+					B[A[j]] = B[A[j]] - 1
+
+		High Level Description:
+			Create an Array B that contains M elements where M is the largest integer in the original set.
+				Initialize all elements to 0; this array will keep track of the number of each element in each set.
+			Iterate through the initial array, 
+				for each element, increment the element's count in B.  
+			Then iterate through B, adding up the counts of previous elements such that B[i] = B[i] + B[i - 1].
+				after this loop, B[i] is the number of elements in A that are <= i
+			such that at the end, the Mth element contains the total number of elements in the original array.
+			Finally, sort as follows:
+				for each element in the original array,
+					place it in the position in the new aray corresponding to its current count in the M-element array.
+					after placing it, decrement that count. 
+
+					during this loop, B[i] is the rightmost vacant position for an element i.
+
+		Time Complexity: 
+			- Iterate through n-element original array twice, Iterate through the M-element count array twice
+			  => O(n + M)
+
+	- Radix Sort
+		- For a list of numbers the largest of which has d digits,
+			perform d counting sorts, sorting the list by digit value starting with the least significant digit. 
+
+			because count sort is stable, starting with the least significant digit guarantees the numbers will sort correctly for higher digits.
+
+		- time complexity of d count sorts = O(d*n), not d*(n+M), since the size of the numbers no longer effects the method. 
+
+	- Insertion Sort
+		- High Level Description
+			Starting with the second element, iterate through the list.
+				for each element, iterate backwards through its previous elements, 
+					swap the current element with its previous if its previous is greater.
+
+				because we perform this process at each element, we can be sure that all elements prior 
+				to the current are in order; each step in the forward iteration is just a matter of putting 
+				the new element in the correct spot in a growing, sorted array. 
+
+		- Psuedo Code
+			function InsertionSort(A[1...n]):
+				for i from 2 to n:
+					j = i
+					while j > 1 and A[j] < A[j-1]:
+						swap A[j] and A[j-1]
+						j = j-1
+
+		- Time Complexity
+			T(n) = 1 + 2 + 3 + .... + n = O(n^2)
+
+
+
+	- Selection Sort
+		- High Level Description
+			iterate through the array
+				for each element, search from the current element to the end of the array and find the minimum
+				element. Then swap it with the current element.
+
+		- Psuedo Code
+			function SelectionSort(A[1...n]):
+				for i from 1 to n:
+					k = i
+					for j from i+1 to n:
+						if A[j] < A[k]:
+							k = j //(A[k] is the min of A[i ... n]
+					swap A[i] and A[k]
+
+		- Time Complexity
+			T(n) = n + n - 1 + ... + 1 = O(n^2)
+
+	- Lower Bound for Comparison Sorts 
+		- Comparison sorts can be modeled as decision trees where the number of leaves is at least n! for all possible permutations (compare each element to every other) 
+
+		=> worst case number of comparisons is log2(n!) = Omega(nlogn)
+			this is because n! > (n/2)^(n/2) 
+
+
+Heap Sort
+	- Description 
+		Given an array A[1 ... n] insert all its elements into a min-heap. Then extract the min n times.
+
+		Sorts in place (no extra space needed)
+		not stable  
+
+	- PsuedoCode //Heap sort in place
+		function HeapSort(A[1...n]):
+			BuildMaxHeap(A)
+			size = n
+			for i from n to 2:
+				swap A[size] and A[1]
+				size--
+				SiftDown(A, 1)
+
+	- Time Complexity
+		Build Heap function is T(n) = 2*n = O(n)
+		Extract the min n times = O(nlog(n)) for n logn extract and siftdown operations.
+
+		=> total time for algorithm is O(nlog(n))
+
+
+
+Merge Sort
+	- Description
+		Recursively split the array in half until at singletons;
+		Recombine ("Merge") Sets togeher in sorted order on the way back up.
+
+	- PsuedoCode
+		function MergeSort(A[1...n], l, r):
+			if l >= r:
+				return
+			middle = floor((l+r)/2)
+			return Merge(MergeSort(A, l, m), MergeSort(A, m+1, r)) 
+
+		function Merge(A[1...n], B[1...m]): //inputs are sorted
+			Create new array C with n+m elements to be the output.
+			i = 1, j = 1 //indexes into A and B
+			for k from 1 to n+m:
+				if A[i] <= B[j]:
+					C[k] = A[i]
+					i++
+				else
+					C[k] = B[j]
+					j++
+			return C
+
+	- Time Complexity:
+		Merge is O(n)
+		=> T(n) <= 2*T(n/2) + O(n)
+		   by the master theorem, complexity is O(nlog(n))
+
+	- takes O(n) extra space for holder arrays for merge.
+
+
+
+Quick Sort
+	- Sorts in place, no extra space needed
+
+	- Psuedocode:
+		function QuickSort(A[1...n], l, r):
+			if l >= r:
+				return 
+
+			m = Partition(A, l, r)
+			QuickSort(A, l, m - 1)
+			QuickSort(A, m + 1, r)
+
+		function Partition(A[1...n], l, r)
+			x = A[l]
+			j = l
+			for i from l+1 to r: 
+				if A[i] <= x:
+					j++
+					swap A[j] and A[i]
+			swap A[l] and A[j]
+			return j
+
+	- Pivots can be good or bad. If the pivots are bad, 
+	  Algorithm can be O(n^2). Bad pivots partition the set unevenly; they are uneven.
+	  	- balance reduces the number of comparisons needed
+
+	- Pivots depend on the initial ordering of the set, when picking pivots from the left.
+
+	- Observation: Half of the elements of A guarante a blanaced partition.
+	=> By selecting random pivots, we can acheive an average running time of O(nlog(n))
+		do this by picking a random element and swapping it with A[l] before partitioning.
+
+	- Intro Sort
+		runs quick sort with a simple deterministic pivot selection heuristic (say, median of the first, middle, and last element).
+
+		if the recursion depth exceeds a certain threshold, clog(n) the algorithm switches to heap sort.
+
+
+
+********** Decomposition of Graphs **********
+
+Graphs
+	- Ways to Represent
+		- Edge List: Exactly what it sounds like.
+			- space: Theta(|E|)
+			- find if edge exists: Theta(|E|)
+			- find all neighbors of u: Theta(|E|)
+
+		- Adjacency Matrix: nxn matrix where element ij being 1 indicates an edge between nodes i and j.
+			- space: Theta(|V|^2)
+			- find if edge exists: Theta(1)
+			- neighbors of u: Theta(|V|)
+
+		- Adjacency List: Each node stores a list of nodes it is connected to.
+			- space: Theta(|V| + |E|)
+			- find if edge exists: deg(u)
+			- neighbors of u: deg(u)
+
+
+
+Depth-First Search in Undirected Graphs
+	- Finding all nodes reachable from a particular node:
+		- Psuedocode:
+			function Explore(v):
+				visited[v] = true
+				previsit(v)
+				for each edge (v, u) in E:
+					if visited[u] = false:
+						Explore(u)
+				postvisit(v)
+
+	- Depth-first Search:
+		- Psuedocode
+			- from the slides:
+				function DFS(G):
+					for all nodes v:
+						visited[v] = false
+					for all nodes v:
+						Explore(v)
+
+			- my interpretation:
+				function DFS(v):
+					if visited[v] = true:
+						return
+
+					visited[v] = true
+					previsit(v)
+					for each of v's neighbors:
+						DFS(neighbor)
+					postvisit(v) 
+
+
+		- Running time
+			- O(|V| + |E|) since Explore is called exactly once for each
+				node v and each edge is examined either once (directed) or 
+				twice (undirected)
+
+	- Connected Components (of Undirected Graphs)
+		- def: an inclusion-wise maximal subset of vertices such that there is a path between any two of them.
+
+		- finding connected components:
+			- Psuedocode
+				function ConnectedComponents(G):
+					initialize all nodes to not visited
+
+					num_cc = 0
+					iterate through all nodes in v:
+						if visited[v] = false:
+							num_cc++	
+							DFS(v)
+
+
+
+Depth-First Search in Directed Graphs
+	- Lemma: a directed graph has a cycle iff its dfs search reveals a back edge.
+
+	- find if directed graph contains a cycle:
+		function CheckForCycles(G):
+			initialize two arrays pre and post visited to keep track for each node in G.
+
+			iterate through the nodes:
+				for each node: perform dfs s.t.
+					previsit
+						recursively visit
+					postvisit
+
+			if at anypoint a node is visited that is previsited but not post visited, this implies that a cycle exists.	
+
+	- Topological Ordering
+		- def: linearization of a directed graph; linear ordering of its vertices suc hthat for any edge(u, v), u comes before v.
+
+		- lemma: a directed graph can be linearized iff it is a DAG
+			- aka if there is a cycle the graph cannot be linearized
+
+		- each DAG contains at least one source and at least one sink.
+			=> to linearize, find a source, output it, delete it from the graph.
+
+		- Psuedocode:
+			For Graph G with V vertices
+				Create array visited size V initialized to false
+				Create array indegrees size V initialized to 0 //keeps track of edges pointing towards nodes.
+				Create a stack called sources to hold source nodes.
+				for each vertex in G:
+					for each neighbor of vertex:
+						indegrees[neighbor]++;
+
+				for each vertex in G:
+					if indegrees[vertex] is 0:
+						push vertex onto sources
+
+				while sources is not empty:
+					pop a source off the stack
+					Remove source from G
+					for each of source's neighbors:
+						indegrees[neighbor]--;
+
+						if indegrees[neighbor] is 0:
+							push it onto the stack, its now a source
+
+				
+
+
+
+
+
+
+
+
+
+				
+
+
+
+
+
+				

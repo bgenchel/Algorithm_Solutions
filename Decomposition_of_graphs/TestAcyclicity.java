@@ -41,25 +41,25 @@ class Main {
   							boolean[] postvisited, 
   							HashMap<Integer, LinkedList<Integer>> graph){
 
-  	if(!graph.containsKey(start))
-  		return false;
+  	 if(!graph.containsKey(start))
+  	     return false;
   	
-  	if(previsited[start] && !postvisited[start])
-		return true;
+  	  if(previsited[start] && !postvisited[start])
+		      return true;
 
-	previsited[start] = true;
+	   previsited[start] = true;
 
-	LinkedList<Integer> adj = graph.get(start);
-  	while(!adj.isEmpty()){
-  		int neighbor = adj.poll();
+	    LinkedList<Integer> adj = graph.get(start);
+  	   while(!adj.isEmpty()){
+  		    int neighbor = adj.poll();
 
-  		if(DFS(neighbor, previsited, postvisited, graph))
-  			return true;
+  		  if(DFS(neighbor, previsited, postvisited, graph))
+  			   return true;
 
-  	}
+  	   }
 
-  	postvisited[start] = true;
-  	return false;
+  	   postvisited[start] = true;
+  	   return false;
   }
 
 }

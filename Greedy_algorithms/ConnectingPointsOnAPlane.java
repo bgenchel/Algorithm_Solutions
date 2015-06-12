@@ -31,6 +31,8 @@
 // Sample Output 2:
 // 7.064495102
 
+//Implements Kruskal's Algorithm
+
 import java.util.*;
 
 class Main {

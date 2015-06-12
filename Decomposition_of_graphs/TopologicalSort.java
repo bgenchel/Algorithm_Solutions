@@ -21,8 +21,6 @@ class Main {
   	int n = sc.nextInt();
   	int m = sc.nextInt();
 
-  	//boolean[] previsited = new boolean[n+1];
-  	//boolean[] postvisited = new boolean[n+1];
   	int[] indegrees = new int[n+1];
   	boolean[] visited = new boolean[n+1];
   	HashMap<Integer, LinkedList<Integer>> graph = new HashMap<Integer, LinkedList<Integer>>();
@@ -41,10 +39,6 @@ class Main {
   		graph.get(start).add(end);
   	}
 
-  	// System.out.println("FUCK THIS");
-  	// System.out.println("NIEGHBOR SIZE = " + graph.get(1).size());
-  	// printLL(graph.get(1));
-
   	Stack<Integer> sources = new Stack<Integer>();
   	for(int i = 1; i < visited.length; i++){
   		if(!visited[i])
@@ -57,18 +51,18 @@ class Main {
   		}
   	}
   	while(!sources.isEmpty()){
-		int curr = sources.pop();
-		//System.out.println("curr = " + curr);
-		System.out.print(curr + " ");
-		//printLL(graph.get(curr));
-		for(int neighbor : graph.get(curr)){
-			//System.out.println("neighbor = " + neighbor);
-			indegrees[neighbor]--;
-			if(indegrees[neighbor] == 0){
-				//System.out.println("adding " + neighbor + " to sources");
-				sources.push(neighbor);
-			}
-		}
+    		int curr = sources.pop();
+    		//System.out.println("curr = " + curr);
+    		System.out.print(curr + " ");
+    		//printLL(graph.get(curr));
+    		for(int neighbor : graph.get(curr)){
+    			//System.out.println("neighbor = " + neighbor);
+    			indegrees[neighbor]--;
+    			if(indegrees[neighbor] == 0){
+    				//System.out.println("adding " + neighbor + " to sources");
+    				sources.push(neighbor);
+    			}
+    		}
   	}
  }
 
