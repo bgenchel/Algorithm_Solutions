@@ -20,8 +20,7 @@ class Main {
   	for(int i = 0; i < m; i++)
   		points.add(sc.nextInt());
 
-  	ArrayList<Integer> us_points 
-  		= new ArrayList<Integer>(points);
+  	ArrayList<Integer> us_points = new ArrayList<Integer>(points);
   	HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
 
   	points.add(Integer.MAX_VALUE);

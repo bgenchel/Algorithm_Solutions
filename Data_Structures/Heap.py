@@ -1,6 +1,5 @@
 import sys
 
-
 def insert(val, heap):
     heap.append(val)
     curr = len(heap) - 1
@@ -11,7 +10,6 @@ def insert(val, heap):
         heap[curr] = temp
         curr = par
         par = curr//2
-
 
 def extract(heap):
     if len(heap) < 2:

@@ -12,6 +12,7 @@ class Main {
   	int n = sc.nextInt();
   	int m = sc.nextInt();
 
+    //Graph Creation
   	boolean[] visited = new boolean[n+1];
   	HashMap<Integer, LinkedList<Integer>> graph = new HashMap<Integer, LinkedList<Integer>>();
   	for(int i = 0; i < m; i++){
@@ -26,17 +27,18 @@ class Main {
   		graph.get(end).add(start);
   	}
 
+    //
   	int num_cc = 0;
   	for(int i = 1; i < visited.length; i++){
   		if(!visited[i]){
   			num_cc++;
-  			DFS(i, visited, graph);
+  			BFS(i, visited, graph);
   		}
-	}
-	System.out.println(num_cc);
+	  }
+	  System.out.println(num_cc);
   }
 
-  public static void DFS(int start, boolean[] visited, 
+  public static void BFS(int start, boolean[] visited, 
   							HashMap<Integer, LinkedList<Integer>> graph){
 
   	if(!graph.containsKey(start))

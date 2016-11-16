@@ -1,15 +1,15 @@
 // Advanced Code Problem: Shortest Paths
 
-// The first line of the input contains the number of 
-// vertices 1≤n≤10^3, the number of edges 0≤m≤10^4, and a 
-// vertex 1≤s≤n of a directed graph. The next m lines 
-// define the edges of the graph. All the weights are 
-// integers of absolute value at most 10^9. For all vertices 
+// The first line of the input contains the number of
+// vertices 1 ≤ n ≤ 10^3, the number of edges 0≤m≤10^4, and a
+// vertex 1≤s≤n of a directed graph. The next m lines
+// define the edges of the graph. All the weights are
+// integers of absolute value at most 10^9. For all vertices
 // u from 1 to n output the following in a separate line:
 //
 // o   *, if there is no path from s to u;
-// o   -, if there is a path from s to u, but there is no 
-//        shortest path from s to u (i.e., the distance 
+// o   -, if there is a path from s to u, but there is no
+//        shortest path from s to u (i.e., the distance
 //        from s to u is −∞);
 // o    the length of a shortest path otherwise.
 

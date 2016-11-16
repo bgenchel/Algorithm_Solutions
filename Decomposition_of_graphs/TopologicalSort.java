@@ -72,22 +72,23 @@ class Main {
   		System.out.println(i);
   }
 
-  public static void CountDegrees(int start, boolean[] visited, 
-  							int[] indegrees, 
-  							HashMap<Integer, LinkedList<Integer>> graph){
+  public static void CountDegrees(
+    int start, 
+    boolean[] visited, int[] indegrees, 
+  	HashMap<Integer, LinkedList<Integer>> graph
+  ){
   	//System.out.println("CD is visiting " + start);
   	if(!graph.containsKey(start)){
   		graph.put(start, new LinkedList<Integer>());
   		return;
   	}
 
-	for(int neighbor : graph.get(start)){
+	  for(int neighbor : graph.get(start)){
 		//System.out.println("incrementing degrees for " + neighbor);
   		indegrees[neighbor]++;
   	}
 
   	visited[start] = true;
-
   	return;
   }
 

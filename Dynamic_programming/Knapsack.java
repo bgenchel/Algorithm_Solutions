@@ -48,7 +48,7 @@ class Main {
 					dp[i][j] = dp[i][j-1];
 			}
 		}
-		return dp[capacity][weights.length-1];
+		return dp[capacity][weights.length-1]
 	}
 
 	public static void printMatrix(int[][] mat){

@@ -26,15 +26,15 @@ class Main {
   	HashMap<Integer, LinkedList<Integer>> graph = 
   						new HashMap<Integer, LinkedList<Integer>>();
   	for(int i = 0; i < m; i++){
-		int node1 = sc.nextInt();
-		int node2 = sc.nextInt();
-		if(!graph.containsKey(node1))
-			graph.put(node1, new LinkedList<Integer>());
-		if(!graph.containsKey(node2))
-			graph.put(node2, new LinkedList<Integer>());
+  		int node1 = sc.nextInt();
+  		int node2 = sc.nextInt();
+  		if(!graph.containsKey(node1))
+  			graph.put(node1, new LinkedList<Integer>());
+  		if(!graph.containsKey(node2))
+  			graph.put(node2, new LinkedList<Integer>());
 
-		graph.get(node1).add(node2);
-		graph.get(node2).add(node1);
+  		graph.get(node1).add(node2);
+  		graph.get(node2).add(node1);
   	}
 
   	int[] distances = new int[n+1];
